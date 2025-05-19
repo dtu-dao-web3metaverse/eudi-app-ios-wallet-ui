@@ -48,6 +48,9 @@ struct HomeTabView<Router: RouterHost>: View {
       Button(.inPerson) {
         viewModel.onShare()
       }
+    Button("Nearby") {        
+      viewModel.onNearby()
+    }
       Button(.online) {
         viewModel.onShowScanner()
       }

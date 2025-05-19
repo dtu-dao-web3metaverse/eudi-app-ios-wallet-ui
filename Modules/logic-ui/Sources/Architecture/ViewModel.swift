@@ -17,6 +17,8 @@
 @_exported import Combine
 @_exported import Copyable
 
+import SwiftCBOR
+
 public protocol ViewState {}
 
 @MainActor
@@ -36,4 +38,20 @@ open class ViewModel<Router: RouterHost, UiState: ViewState>: ObservableObject {
   public func setState(_ reducer: (UiState) -> UiState) {
     self.viewState = reducer(viewState)
   }
+}
+
+func generateOverriddenQrPayload() -> String {
+    let fixedUUID = "00000001-0002-0003-0004-000000000005"
+    let cbor = CBOR.map([
+        CBOR.unsignedInt(0): CBOR.map([
+            CBOR.unsignedInt(1): CBOR.utf8String(fixedUUID)
+        ])
+    ])
+    do {
+        let encoded: [UInt8] = try CBOR.encode(cbor)
+        let base64 = Data(encoded).base64EncodedString()
+        return "mdoc:\(base64)"
+    } catch {
+        return "❌ encode failed: \(error)"
+    }
 }

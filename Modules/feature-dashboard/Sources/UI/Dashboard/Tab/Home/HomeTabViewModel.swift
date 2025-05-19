@@ -117,6 +117,30 @@ final class HomeTabViewModel<Router: RouterHost>: ViewModel<Router, HomeTabState
       }
     }
   }
+    
+func onNearby() {
+    Task {
+      let state = await Task.detached { () -> Reachability.BleAvailibity in
+        return await self.interactor.getBleAvailability()
+      }.value
+
+      switch state {
+      case .available:
+        self.router.push(
+          with: .featureProximityModule(
+            .proximityConnection(
+              presentationCoordinator: await self.interactor.getWalletKitController().startProximityPresentation(),
+              originator: .featureDashboardModule(.dashboard)
+            )
+          )
+        )
+      case .noPermission, .disabled:
+        self.toggleBleModal()
+      default:
+        break
+      }
+    }
+  } 
 
   func toggleBleModal() {
     guard viewState.phase == .active else {
